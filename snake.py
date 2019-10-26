@@ -20,6 +20,10 @@ class SnakeGame():
 		self.screen.leaveok(0)
 		self.screen.nodelay(True)
 		self.screen.border()
+		curses.start_color()
+		curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
+		curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
+		curses.init_pair(3, curses.COLOR_CYAN, curses.COLOR_BLACK)
 		self.snake.block(self.screen.getmaxyx())
 		self.ticks = 0
 		self.speed = start_speed
@@ -30,15 +34,16 @@ class SnakeGame():
 		self.blocking_char = 'X'
 
 	def print_snake(self):
+		maxes = self.screen.getmaxyx()
 		if not self.infinite:
 			self.screen.clear()
 		self.screen.border()
 		if len(self.snake.a) < self.min_apples:
-			self.snake.apple(self.screen.getmaxyx())
+			self.snake.apple(maxes)
 		if self.snake.eat(self.growth):
 			curses.beep()
 			self.points = self.points + 10
-		if self.snake.dead(self.screen.getmaxyx()):
+		if self.snake.dead(maxes):
 			raise SnakeDead
 		for i in range(self.snake.l):
 			if i == 0: 
@@ -47,9 +52,11 @@ class SnakeGame():
 				char = '*'
 			self.screen.addstr(self.snake.p[i].y,(self.snake.p[i].x*2),char)
 		for i in range(len(self.snake.a)):
-			self.screen.addstr(self.snake.a[i].y,(self.snake.a[i].x*2), self.apple_char)
+			self.screen.addstr(	self.snake.a[i].y,(self.snake.a[i].x*2),
+								self.apple_char, curses.color_pair(2) | curses.A_BOLD)
 		for i in range(len(self.snake.b)):
-			self.screen.addstr(self.snake.b[i].y,(self.snake.b[i].x*2), self.blocking_char)
+			self.screen.addstr(	self.snake.b[i].y,(self.snake.b[i].x*2),
+								self.blocking_char, curses.color_pair(3) | curses.A_BOLD)
 		self.screen.move(0,0)
 		self.screen.refresh()
 
@@ -85,25 +92,13 @@ class SnakeGame():
 			self.screen.addstr(8,midpoint-int(len(message2)/2),message2)
 			self.screen.addstr(14,midpoint-int(len(message4)/2),message4)
 			self.screen.refresh()
-		except KeyboardInterrupt:
-			curses.nocbreak()
-			self.screen.keypad(False)
-			curses.echo()
-			curses.endwin()
-			quit()
-		try:
-			time.sleep(3)
-			self.screen.addstr(11,midpoint-int(len(message3)/2),message3)
-			self.screen.nodelay(False)
-			key = self.screen.getch()
-			if key:
-				return True
-		except KeyboardInterrupt:
-			curses.nocbreak()
-			self.screen.keypad(False)
-			curses.echo()
-			curses.endwin()
-			quit()
+		time.sleep(3)
+		throwaway = self.screen.getkey()
+		self.screen.addstr(11,midpoint-int(len(message3)/2),message3)
+		self.screen.nodelay(False)
+		key = self.screen.getch()
+		if key:
+			return True
 
 if __name__ == '__main__':
 	infinite = False
@@ -127,6 +122,12 @@ if __name__ == '__main__':
 		except ValueError:
 			pass
 	while True:
-		game = SnakeGame(infinite=infinite, start_speed=speed, difficulty=difficulty)
-		game.play()
-
+		try:
+			game = SnakeGame(infinite=infinite, start_speed=speed, difficulty=difficulty)
+			game.play()
+		except KeyboardInterrupt:
+			curses.nocbreak()
+			game.screen.keypad(False)
+			curses.echo()
+			curses.endwin()
+			quit()

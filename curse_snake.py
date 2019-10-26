@@ -117,10 +117,10 @@ class Snake:
 				next_wall = copy.deepcopy(wall)
 				next_wall.move(direction)
 				if not (next_wall.y > (maxes[0]-2) or 
-						next_wall.x > (maxes[1]*2)-2 or 
-						next_wall.x < 1 or 
-						next_wall.y < 1):
-					if x == 10 and (y >= 10 and y <=15):
+						(next_wall.x*2) > (maxes[1]-2) or
+						next_wall.x <= 1 or
+						next_wall.y <= 1):
+					if x == 10 and (y >= 2 and y <=20):
 						continue
 					self.b.append(next_wall)
 					wall = next_wall
