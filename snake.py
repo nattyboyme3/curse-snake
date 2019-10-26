@@ -3,8 +3,10 @@ import curses
 import time
 from sys import argv
 
+
 class SnakeDead(RuntimeError):
 	pass
+
 
 class SnakeGame():
 	def __init__(self,infinite=False, start_speed=0.15, difficulty=20):

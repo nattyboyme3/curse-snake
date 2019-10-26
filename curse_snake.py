@@ -86,12 +86,13 @@ class Snake:
 	def apple(self, maxes):
 		spawned = False
 		while not spawned:
-			spawed = True
+			spawned = True
 			y = random.randint(1,maxes[0]-2)
 			x = random.randint(1,int(maxes[1]/2)-2)
 			for i in self.b:
 				if i.x == x and i.y == y:
 					spawned = False
+					break
 		self.a.append(Position(y,x))
 
 	def eat(self, growth):
