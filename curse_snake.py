@@ -50,7 +50,6 @@ class Snake:
             n.move(SOUTH)
             self.p.append(n)
 
-
     def turn(self, r=True):
         if r == True:
             self.d = ( self.d + 1 ) % 4
