@@ -9,7 +9,7 @@ class SnakeDead(RuntimeError):
 
 
 class SnakeGame():
-    def __init__(self, is_simple=True, is_infinite=False, start_speed=0.15, walls=20):
+    def __init__(self, is_simple=True, is_infinite=False, start_speed=0.3, walls=10):
         self.snake = Snake(h=walls)
         self.infinite = is_infinite
         self.simple = is_simple
@@ -34,6 +34,20 @@ class SnakeGame():
         self.points =0
         self.apple_char = "Q"
         self.blocking_char = 'X'
+
+    def pause(self):
+        maxes = self.screen.getmaxyx()
+        pause_window = curses.newwin(5, 20, 4, int(maxes[1]/2)-10)
+        pause_window.bkgdset(' ', curses.color_pair(4) | curses.A_BOLD)
+        pause_window.border()
+        pause_window.addstr(2, 4, 'GAME IS PAUSED')
+        pause_window.refresh()
+        pause_window.move(0, 0)
+        key = -1
+        while key != 32:
+            key = self.screen.getch()
+
+
 
     def print_snake(self):
         maxes = self.screen.getmaxyx()
@@ -101,22 +115,7 @@ class SnakeGame():
                         if not self.snake.d == 2:
                             self.snake.d = 0
                     elif key == 32:
-                        self.screen.nodelay(False)
-                        midpoint = int(self.screen.getmaxyx()[1] / 2)
-                        paused = '   GAME IS PAUSED   '
-                        twenty_spaces = '                    '
-                        self.screen.addstr(4, midpoint - int(len(twenty_spaces) / 2), twenty_spaces,
-                                           curses.color_pair(4) | curses.A_BOLD)
-                        self.screen.addstr(5, midpoint - int(len(paused) / 2), paused,
-                                           curses.color_pair(4) | curses.A_BOLD)
-                        self.screen.addstr(6, midpoint - int(len(twenty_spaces) / 2), twenty_spaces,
-                                           curses.color_pair(4) | curses.A_BOLD)
-                        self.screen.move(0, 0)
-                        self.screen.refresh()
-                        key = -1
-                        while key != 32:
-                            key = self.screen.getch()
-                        self.screen.nodelay(True)
+                        self.pause()
                 self.snake.move()
                 self.ticks = self.ticks + 1
                 if self.ticks % 177 == 0:
@@ -150,8 +149,8 @@ class SnakeGame():
 
 if __name__ == '__main__':
     infinite = False
-    speed=0.15
-    difficulty = 20
+    speed=0.3
+    difficulty = 10
     simple = False
     if len(argv) > 1:
         arg_index = 1

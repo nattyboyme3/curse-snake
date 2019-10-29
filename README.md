@@ -13,6 +13,6 @@ Available arguments:
 
 Turning the infinite option on provides an extra challenge: the game doesn't erase snake body characters after the snake has left the space. You can still reuse these spaces, but you might run into your tail once it gets long.
 
-The move interval is in units of seconds. A recommended starting interval is .3 seconds, or .15 seconds if you don't have walls. 
+The move interval is in units of seconds. A recommended starting interval is .3 seconds, or .15 seconds if you don't have walls. The default is .3 seconds.  
 
-The number of walls created increases the difficulty. 0 to 20 walls is a good starting place. 
+The number of walls created increases the difficulty. 5 to 20 walls is a good starting place. The default is 10.
