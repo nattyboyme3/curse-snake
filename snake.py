@@ -4,7 +4,7 @@ import time
 from sys import argv
 
 KEYS = [
-    (19, 87, curses.KEY_UP),
+    (119, 87, curses.KEY_UP),
     (100, 68, curses.KEY_RIGHT),
     (115, 83, curses.KEY_DOWN),
     (97, 65, curses.KEY_LEFT),
@@ -21,7 +21,6 @@ class SnakeGame():
         self.walls = walls
         self.infinite = is_infinite
         self.simple = is_simple
-        # initialize curses
         self.screen = curses.initscr()
         curses.noecho()
         curses.cbreak()
@@ -50,20 +49,17 @@ class SnakeGame():
         countdown_window.bkgdset(' ', curses.color_pair(4) | curses.A_BOLD)
         countdown_window.bkgd(' ', curses.color_pair(4) | curses.A_BOLD)
         countdown_window.border()
-        countdown_window.addstr(2, 4, 'GET READY!', curses.color_pair(4) | curses.A_BOLD)
+        countdown_window.addstr(1, 5, 'GET READY!', curses.color_pair(4) | curses.A_BOLD)
         countdown_window.refresh()
         countdown = 3
         while countdown > 0:
             countdown_string = ' ...' + str(countdown) + '... '
-            countdown_window.addstr(4, 4, str(countdown_string), curses.color_pair(4) | curses.A_BOLD)
+            countdown_window.addstr(2, 6, str(countdown_string), curses.color_pair(4) | curses.A_BOLD)
             countdown_window.move(0, 0)
             countdown_window.refresh()
             countdown = countdown - 1
             time.sleep(1)
         countdown_window.move(0, 0)
-        key = -1
-        while key != 32:
-            key = self.screen.getch()
 
     def pause(self):
         maxes = self.screen.getmaxyx()
@@ -173,18 +169,25 @@ class SnakeGame():
         except SnakeDead:
             message1 = 'OH NOOES!!!!!!'
             message2 = f"Your snake died with {int(self.points)} points"
-            message3 = 'Press any key to try again'
+            continue_message = 'Press any key to try again'
+            message3 = "Enter your initials: "
             message4 = 'Press CTRL+C to exit'
             midpoint = int(self.screen.getmaxyx()[1]/2)
-            self.screen.addstr(5,midpoint-int(len(message1)/2),message1)
-            self.screen.addstr(8,midpoint-int(len(message2)/2),message2)
-            self.screen.addstr(14,midpoint-int(len(message4)/2),message4)
+            self.screen.addstr(5, midpoint-int(len(message1)/2), message1)
+            self.screen.addstr(8, midpoint-int(len(message2)/2), message2)
+            self.screen.addstr(11, midpoint-int(len(message4)/2), message4)
+            self.screen.addstr(14, midpoint-int(len(message3)/2), message3)
+            curses.echo()
+            curses.nocbreak()
+            self.screen.nodelay(False)
             self.screen.refresh()
+            initials = self.screen.getstr(3)
+
         time.sleep(3)
         key = 1
         while key != -1:
             key = self.screen.getch()
-        self.screen.addstr(11,midpoint-int(len(message3)/2),message3)
+        self.screen.addstr(11, midpoint-int(len(continue_message)/2), continue_message)
         self.screen.nodelay(False)
         key = self.screen.getch()
         if key:
