@@ -11,6 +11,7 @@ class SnakeDead(RuntimeError):
 class SnakeGame():
     def __init__(self, is_simple=True, is_infinite=False, start_speed=0.3, walls=10):
         self.snake = Snake(h=walls)
+        self.walls = walls
         self.infinite = is_infinite
         self.simple = is_simple
         # initialize curses
@@ -27,11 +28,12 @@ class SnakeGame():
         curses.init_pair(3, curses.COLOR_CYAN, curses.COLOR_BLACK)
         curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_YELLOW)
         self.snake.wall(self.screen.getmaxyx())
+        self.fast = False
         self.ticks = 0
         self.speed = start_speed
         self.growth = 1
         self.min_apples = 1
-        self.points =0
+        self.points = float(0)
         self.apple_char = "Q"
         self.blocking_char = 'X'
 
@@ -39,8 +41,9 @@ class SnakeGame():
         maxes = self.screen.getmaxyx()
         pause_window = curses.newwin(5, 20, 4, int(maxes[1]/2)-10)
         pause_window.bkgdset(' ', curses.color_pair(4) | curses.A_BOLD)
+        pause_window.bkgd(' ', curses.color_pair(4) | curses.A_BOLD)
         pause_window.border()
-        pause_window.addstr(2, 4, 'GAME IS PAUSED')
+        pause_window.addstr(2, 3, 'GAME IS PAUSED')
         pause_window.refresh()
         pause_window.move(0, 0)
         key = -1
@@ -58,7 +61,7 @@ class SnakeGame():
             self.snake.apple(maxes)
         if self.snake.eat(self.growth):
             curses.beep()
-            self.points = self.points + 10
+            self.points = self.points + self.walls
         if self.snake.dead(maxes):
             raise SnakeDead
         for i in range(self.snake.l):
@@ -94,8 +97,16 @@ class SnakeGame():
                 time.sleep(1)
             while True:
                 self.print_snake()
-                time.sleep(self.speed)
-                key = self.screen.getch()
+                if self.fast:
+                    time.sleep(self.speed/4)
+                else:
+                    time.sleep(self.speed)
+                key = 999
+                last_key = -1
+                while key != -1:
+                    last_key = key
+                    key = self.screen.getch()
+                key = last_key
                 if self.simple:
                     if key == 97 or key == 65 or key == curses.KEY_LEFT:
                         self.snake.turn_left()
@@ -103,32 +114,50 @@ class SnakeGame():
                         self.snake.turn_right()
                 else:
                     if key == 97 or key == 65 or key == curses.KEY_LEFT:
+                        if self.snake.d == 3:
+                            self.fast = True
+                        else:
+                            self.fast = False
                         if not self.snake.d == 1:
                             self.snake.d = 3
                     elif key == 100 or key == 68 or key == curses.KEY_RIGHT:
+                        if self.snake.d == 1:
+                            self.fast = True
+                        else:
+                            self.fast = False
                         if not self.snake.d == 3:
                             self.snake.d = 1
                     elif key == 115 or key == 83 or key == curses.KEY_DOWN:
+                        if self.snake.d == 2:
+                            self.fast = True
+                        else:
+                            self.fast = False
                         if not self.snake.d == 0:
                             self.snake.d = 2
                     elif key == 119 or key == 87 or key == curses.KEY_UP:
+                        if self.snake.d == 0:
+                            self.fast = True
+                        else:
+                            self.fast = False
                         if not self.snake.d == 2:
                             self.snake.d = 0
                     elif key == 32:
                         self.pause()
+                    else:
+                        self.fast = False
                 self.snake.move()
                 self.ticks = self.ticks + 1
-                if self.ticks % 177 == 0:
+                if self.ticks % 103 == 0:
                     self.speed = self.speed - .01
-                if self.ticks % 223 == 0:
+                if self.ticks % 343 == 0:
                     self.growth = self.growth + 1
-                if self.ticks % 453 == 0:
+                if self.ticks % 198 == 0:
                     self.min_apples = self.min_apples + 1
-                self.points = self.points + self.min_apples
+                self.points = self.points + (1 - self.speed)
 
         except SnakeDead:
             message1 = 'OH NOOES!!!!!!'
-            message2 = f"Your snake died with {self.points} points"
+            message2 = f"Your snake died with {int(self.points)} points"
             message3 = 'Press any key to try again'
             message4 = 'Press CTRL+C to exit'
             midpoint = int(self.screen.getmaxyx()[1]/2)
