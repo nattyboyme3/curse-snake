@@ -3,6 +3,13 @@ import curses
 import time
 from sys import argv
 
+KEYS = [
+    (19, 87, curses.KEY_UP),
+    (100, 68, curses.KEY_RIGHT),
+    (115, 83, curses.KEY_DOWN),
+    (97, 65, curses.KEY_LEFT),
+]
+
 
 class SnakeDead(RuntimeError):
     pass
@@ -37,6 +44,27 @@ class SnakeGame():
         self.apple_char = "Q"
         self.blocking_char = 'X'
 
+    def countdown(self):
+        maxes = self.screen.getmaxyx()
+        countdown_window = curses.newwin(5, 20, 4, int(maxes[1]/2)-10)
+        countdown_window.bkgdset(' ', curses.color_pair(4) | curses.A_BOLD)
+        countdown_window.bkgd(' ', curses.color_pair(4) | curses.A_BOLD)
+        countdown_window.border()
+        countdown_window.addstr(2, 4, 'GET READY!', curses.color_pair(4) | curses.A_BOLD)
+        countdown_window.refresh()
+        countdown = 3
+        while countdown > 0:
+            countdown_string = ' ...' + str(countdown) + '... '
+            countdown_window.addstr(4, 4, str(countdown_string), curses.color_pair(4) | curses.A_BOLD)
+            countdown_window.move(0, 0)
+            countdown_window.refresh()
+            countdown = countdown - 1
+            time.sleep(1)
+        countdown_window.move(0, 0)
+        key = -1
+        while key != 32:
+            key = self.screen.getch()
+
     def pause(self):
         maxes = self.screen.getmaxyx()
         pause_window = curses.newwin(5, 20, 4, int(maxes[1]/2)-10)
@@ -49,8 +77,6 @@ class SnakeGame():
         key = -1
         while key != 32:
             key = self.screen.getch()
-
-
 
     def print_snake(self):
         maxes = self.screen.getmaxyx()
@@ -82,59 +108,48 @@ class SnakeGame():
     def play(self):
         try:
             self.print_snake()
-            start_message = "   GET READY!!   "
-            midpoint = int(self.screen.getmaxyx()[1] / 2)
-            self.screen.addstr(5, midpoint - int(len(start_message) / 2), start_message,
-                               curses.color_pair(4) | curses.A_BOLD)
-            countdown = 3
-            while countdown > 0:
-                countdown_string = ' ...' + str(countdown) + '... '
-                self.screen.addstr(6, midpoint - int(len(countdown_string) / 2), str(countdown_string),
-                                   curses.color_pair(4) | curses.A_BOLD)
-                self.screen.move(0, 0)
-                self.screen.refresh()
-                countdown = countdown - 1
-                time.sleep(1)
+            self.countdown()
             while True:
                 self.print_snake()
                 if self.fast:
                     time.sleep(self.speed/4)
+                    key = 999
+                    last_key = -1
+                    while key != -1:
+                        last_key = key
+                        key = self.screen.getch()
+                    key = last_key
                 else:
                     time.sleep(self.speed)
-                key = 999
-                last_key = -1
-                while key != -1:
-                    last_key = key
                     key = self.screen.getch()
-                key = last_key
                 if self.simple:
                     if key == 97 or key == 65 or key == curses.KEY_LEFT:
                         self.snake.turn_left()
                     elif key == 100 or key == 68 or key == curses.KEY_RIGHT:
                         self.snake.turn_right()
                 else:
-                    if key == 97 or key == 65 or key == curses.KEY_LEFT:
+                    if key in KEYS[3]:
                         if self.snake.d == 3:
                             self.fast = True
                         else:
                             self.fast = False
                         if not self.snake.d == 1:
                             self.snake.d = 3
-                    elif key == 100 or key == 68 or key == curses.KEY_RIGHT:
+                    elif key in KEYS[1]:
                         if self.snake.d == 1:
                             self.fast = True
                         else:
                             self.fast = False
                         if not self.snake.d == 3:
                             self.snake.d = 1
-                    elif key == 115 or key == 83 or key == curses.KEY_DOWN:
+                    elif key in KEYS[2]:
                         if self.snake.d == 2:
                             self.fast = True
                         else:
                             self.fast = False
                         if not self.snake.d == 0:
                             self.snake.d = 2
-                    elif key == 119 or key == 87 or key == curses.KEY_UP:
+                    elif key in KEYS[0]:
                         if self.snake.d == 0:
                             self.fast = True
                         else:

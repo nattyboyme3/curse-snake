@@ -4,10 +4,10 @@ import random
 
 random.seed(time.time())
 
-NORTH = 0
-EAST = 1
-SOUTH = 2
-WEST = 3
+UP = 0
+RIGHT = 1
+DOWN = 2
+LEFT = 3
 
 DIRECTION = ['^', '>', 'V', '<']
 
@@ -18,13 +18,13 @@ class Position():
         self.y = y
 
     def move(self, d,s=1):
-        if d == NORTH:
+        if d == UP:
             self.y = self.y - s
-        if d == EAST:
+        if d == RIGHT:
             self.x = self.x + s
-        if d == SOUTH:
+        if d == DOWN:
             self.y = self.y + s
-        if d == WEST:
+        if d == LEFT:
             self.x = self.x - s
 
     def __eq__(self, other):
@@ -41,13 +41,13 @@ class Snake:
     def __init__(self, y=10, x=10, h=20):
         self.l = 5
         self.h = h
-        self.d = NORTH
+        self.d = UP
         self.p = [Position(y=y,x=x)]
         self.a = [Position(y=y+2, x=x+2)]
         self.b = []
         for i in range(self.l):
             n = copy.deepcopy(self.p[i])
-            n.move(SOUTH)
+            n.move(DOWN)
             self.p.append(n)
 
     def turn(self, r=True):
