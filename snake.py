@@ -2,6 +2,8 @@ from curse_snake import *
 import curses
 import time
 from sys import argv
+import csv
+import os
 
 KEYS = [
     (119, 87, curses.KEY_UP),
@@ -14,6 +16,15 @@ KEYS = [
 class SnakeDead(RuntimeError):
     pass
 
+def clear_pause(screen):
+    key = 1
+    time.sleep(1)
+    screen.nodelay(True)
+    while key != -1:
+        key = screen.getch()
+    screen.nodelay(False)
+    # pause for input
+    key = screen.getch()
 
 class SnakeGame():
     def __init__(self, is_simple=True, is_infinite=False, start_speed=0.3, walls=10):
@@ -42,6 +53,31 @@ class SnakeGame():
         self.points = float(0)
         self.apple_char = "Q"
         self.blocking_char = 'X'
+        self.score_file = '.snake_scores.csv'
+        self.score_fields = ['initials', 'score']
+        self.high_scores = []
+        self.lost = False
+
+    def get_scores(self):
+        scores = []
+        with open(self.score_file,"r", newline='') as csv_file:
+            score_reader = csv.DictReader(csv_file)
+            for row in score_reader:
+                scores.append(row)
+        return scores
+
+    def add_score(self, initials, score):
+        decoded_initials = initials.decode("utf-8")
+        if os.path.exists(self.score_file):
+            append_write = 'a'  # append if already exists
+        else:
+            append_write = 'w'  # make a new file if not
+        with open(self.score_file, append_write, newline='') as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=self.score_fields)
+            if append_write == 'w':
+                writer.writeheader()
+            writer.writerow({self.score_fields[0]: decoded_initials, self.score_fields[1]: score})
+
 
     def countdown(self):
         maxes = self.screen.getmaxyx()
@@ -63,7 +99,7 @@ class SnakeGame():
 
     def pause(self):
         maxes = self.screen.getmaxyx()
-        pause_window = curses.newwin(5, 20, 4, int(maxes[1]/2)-10)
+        pause_window = curses.newwin(5, 22, 4, int(maxes[1]/2)-10)
         pause_window.bkgdset(' ', curses.color_pair(4) | curses.A_BOLD)
         pause_window.bkgd(' ', curses.color_pair(4) | curses.A_BOLD)
         pause_window.border()
@@ -73,6 +109,64 @@ class SnakeGame():
         key = -1
         while key != 32:
             key = self.screen.getch()
+
+    def game_over(self):
+        maxes = self.screen.getmaxyx()
+        score_window = curses.newwin(19, 40, 4, int(maxes[1] / 2) - 20)
+        score_window.bkgdset(' ', curses.color_pair(4))
+        score_window.bkgd(' ', curses.color_pair(4))
+        score_window.border()
+        midpoint = int(score_window.getmaxyx()[1] / 2)
+        message4 = 'Press CTRL+C to exit'
+        continue_message = 'Press any key to continue...'
+        if self.lost:
+            message1 = 'OH NOOES!!!!!!'
+            message2 = f"Your snake died with {int(self.points)} points"
+            message3 = "Enter your initials: "
+        else:
+            message1 = 'Congratulations!!!!'
+            message2 = f'You finished level <number> with {int(self.points)} points'
+            message3 = ''
+        score_window.addstr(2, midpoint - int(len(message1) / 2), message1, curses.color_pair(4) | curses.A_BOLD)
+        score_window.addstr(4, midpoint - int(len(message2) / 2), message2, curses.color_pair(4) | curses.A_BOLD)
+        score_window.addstr(14, midpoint - int(len(message4) / 2), message4, curses.color_pair(4) | curses.A_BOLD)
+        score_window.addstr(6, midpoint - int(len(continue_message) / 2), continue_message, curses.color_pair(4))
+        score_window.refresh()
+        # make sure no stray keys are picked up
+        clear_pause(score_window)
+
+        if self.lost:
+            # get real input
+            curses.echo()
+            curses.nocbreak()
+            score_window.clear()
+            message5 = "HIGH SCORES"
+            score_window.addstr(2, midpoint - int(len(message5) / 2), message5, curses.color_pair(4) | curses.A_BOLD)
+            score_window.addstr(6, midpoint - int(len(message3) / 2)-4, message3, curses.color_pair(4))
+            score_window.refresh()
+            initials = score_window.getstr(3)
+            curses.noecho()
+            curses.cbreak()
+            score_window.clear()
+            score_window.addstr(2, midpoint - int(len(message5) / 2), message5, curses.color_pair(4) | curses.A_BOLD)
+            self.add_score(initials, int(self.points))
+            self.high_scores = self.get_scores()
+
+            sorted_scores = sorted(self.high_scores, key=lambda item: int(item['score']), reverse=True)
+            for i in range(10):
+                if len(sorted_scores) > i:
+                    score_line = f'{i+1} - {sorted_scores[i][self.score_fields[0]]}:' + \
+                                 f' \t {sorted_scores[i][self.score_fields[1]]}'
+                    score_window.addstr(4+i, midpoint - 7, score_line, curses.color_pair(4))
+            score_window.refresh()
+            time.sleep(1)
+            score_window.addstr(15, midpoint - int(len(continue_message) / 2), continue_message,
+                                curses.color_pair(4))
+            score_window.addstr(17, midpoint - int(len(message4) / 2), message4, curses.color_pair(4) | curses.A_BOLD)
+            score_window.refresh()
+            clear_pause(score_window)
+
+        return not self.lost
 
     def print_snake(self):
         maxes = self.screen.getmaxyx()
@@ -167,32 +261,8 @@ class SnakeGame():
                 self.points = self.points + (1 - self.speed)
 
         except SnakeDead:
-            message1 = 'OH NOOES!!!!!!'
-            message2 = f"Your snake died with {int(self.points)} points"
-            continue_message = 'Press any key to try again'
-            message3 = "Enter your initials: "
-            message4 = 'Press CTRL+C to exit'
-            midpoint = int(self.screen.getmaxyx()[1]/2)
-            self.screen.addstr(5, midpoint-int(len(message1)/2), message1)
-            self.screen.addstr(8, midpoint-int(len(message2)/2), message2)
-            self.screen.addstr(11, midpoint-int(len(message4)/2), message4)
-            self.screen.addstr(14, midpoint-int(len(message3)/2), message3)
-            curses.echo()
-            curses.nocbreak()
-            self.screen.nodelay(False)
-            self.screen.refresh()
-            initials = self.screen.getstr(3)
-
-        time.sleep(3)
-        key = 1
-        while key != -1:
-            key = self.screen.getch()
-        self.screen.addstr(11, midpoint-int(len(continue_message)/2), continue_message)
-        self.screen.nodelay(False)
-        key = self.screen.getch()
-        if key:
-            return True
-
+            self.lost = True
+        return self.game_over()
 
 if __name__ == '__main__':
     infinite = False
