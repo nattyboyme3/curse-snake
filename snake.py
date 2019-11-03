@@ -88,6 +88,9 @@ class SnakeGame():
                              })
 
     def countdown(self):
+
+        # TODO : put controls in instructions
+        # TODO : put exit and pause in instructions
         maxes = self.screen.getmaxyx()
         countdown_window = curses.newwin(4, 20, 4, int(maxes[1]/2)-10)
         countdown_window.bkgdset(' ', curses.color_pair(4) | curses.A_BOLD)
@@ -191,7 +194,7 @@ class SnakeGame():
         if self.lost:
             return self.lost, self.points, self.walls, self.speed, self.level
         else:
-            return self.lost, self.points, self.walls + 5, self.start_speed * .95, self.level +1
+            return self.lost, self.points + self.snake.l, self.walls + 5, self.start_speed * .95, self.level +1
 
     def print_snake(self):
         maxes = self.screen.getmaxyx()
@@ -311,7 +314,8 @@ class SnakeGame():
                     else:
                         self.fast = False
                 self.snake.move()
-                self.ticks = self.ticks + 1
+                if not self.fast:
+                    self.ticks = self.ticks + 1
                 if self.ticks % 103 == 0:
                     self.speed = self.speed * .95
                 if self.ticks % 343 == 0:
