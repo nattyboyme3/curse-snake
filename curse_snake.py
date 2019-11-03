@@ -70,6 +70,7 @@ class Snake:
     def move(self):
         prv = copy.deepcopy(self.p[0])
         self.p[0].move(self.d)
+        # TODO: Optimize for non-loop
         for i in range(1,self.l+1):
             nxt = self.p[i]
             self.p[i] = prv

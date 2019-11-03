@@ -236,7 +236,6 @@ class SnakeGame():
         for i in range(len(self.snake.b)):
             self.screen.addstr(	self.snake.b[i].y,(self.snake.b[i].x*2),
                                 self.blocking_char, curses.color_pair(3) | curses.A_BOLD)
-        self.screen.move(0,0)
         self.screen.refresh()
 
     def check_size(self):
@@ -266,6 +265,7 @@ class SnakeGame():
                     time.sleep(self.speed/4)
                     key = 999
                     last_key = -1
+                    #TODO: Find way of making this faster
                     while key != -1:
                         last_key = key
                         key = self.screen.getch()
@@ -325,7 +325,6 @@ class SnakeGame():
                 if self.points > self.start_points + 600:
                     break
                 self.points = self.points + (1 - self.speed)
-
         except SnakeDead:
             self.lost = True
         return self.game_over()
