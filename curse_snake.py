@@ -43,7 +43,7 @@ class Snake:
         self.h = h
         self.d = UP
         self.p = [Position(y=y,x=x)]
-        self.a = [Position(y=y+2, x=x+2)]
+        self.a = []
         self.b = []
         for i in range(self.l):
             n = copy.deepcopy(self.p[i])
@@ -51,7 +51,7 @@ class Snake:
             self.p.append(n)
 
     def turn(self, r=True):
-        if r == True:
+        if r:
             self.d = ( self.d + 1 ) % 4
         else:
             self.d = ( self.d - 1 ) % 4
