@@ -92,14 +92,14 @@ class SnakeGame():
         # TODO : put controls in instructions
         # TODO : put exit and pause in instructions
         maxes = self.screen.getmaxyx()
-        countdown_window = curses.newwin(10, 20, int(maxes[0]/2)-5, int(maxes[1]/2)-10)
+        countdown_window = curses.newwin(10, 25, int(maxes[0]/2)-5, int(maxes[1]/2)-10)
         countdown_window.bkgdset(' ', curses.color_pair(4) | curses.A_BOLD)
         countdown_window.bkgd(' ', curses.color_pair(4) | curses.A_BOLD)
         countdown_window.border()
-        countdown_window.addstr(1, 5, 'GET READY! ', curses.color_pair(4) | curses.A_BOLD)
-        countdown_window.addstr(4,3, 'Move:  Arrow Keys', curses.color_pair(4))
-        countdown_window.addstr(4,3, '       or WASD', curses.color_pair(4))
-        countdown_window.addstr(5,3, 'Pause: Space', curses.color_pair(4))
+        countdown_window.addstr(1, 7, 'GET READY! ', curses.color_pair(4) | curses.A_BOLD)
+        countdown_window.addstr(4,4, 'Move:  Arrow Keys', curses.color_pair(4))
+        countdown_window.addstr(5,4, '       or WASD', curses.color_pair(4))
+        countdown_window.addstr(6,4, 'Pause: Space', curses.color_pair(4))
 
         countdown_window.refresh()
         countdown = 3

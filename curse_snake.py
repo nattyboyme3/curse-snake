@@ -46,15 +46,13 @@ class Snake:
         self.a = []
         self.b = []
         for i in range(self.l):
-            n = copy.deepcopy(self.p[i])
-            n.move(DOWN)
-            self.p.append(n)
+            self.p.append(Position(self.p[i].y+1,self.p[i].x))
 
     def turn(self, r=True):
         if r:
-            self.d = ( self.d + 1 ) % 4
+            self.d = (self.d + 1) % 4
         else:
-            self.d = ( self.d - 1 ) % 4
+            self.d = (self.d - 1) % 4
 
     def turn_left(self):
         self.turn(False)
@@ -64,17 +62,14 @@ class Snake:
 
     def grow(self, x):
         for i in range(x):
-            self.p.append(copy.deepcopy(self.p[self.l-1]))
+            self.p.append(Position(self.p[self.l-1].y,self.p[self.l-1].x))
         self.l = self.l + x
 
     def move(self):
-        prv = copy.deepcopy(self.p[0])
-        self.p[0].move(self.d)
-        # TODO: Optimize for non-loop
-        for i in range(1,self.l+1):
-            nxt = self.p[i]
-            self.p[i] = prv
-            prv = nxt
+        new_head = Position(self.p[0].y, self.p[0].x)
+        new_head.move(self.d)
+        self.p.insert(0, new_head)
+        self.p.pop(len(self.p)-1)
 
     def dead(self, maxes):
         h = self.p[0]
@@ -117,7 +112,7 @@ class Snake:
             x = random.randint(1,int(maxes[1]/2)-2)
             length = random.randint(3,7)
             direction = random.randint(0,3)
-            if x == 10 and (y >= 10 and y <=15):
+            if x == 10 and y>= 10 and y<=15:
                 continue
             wall = Position(y,x)
             self.b.append(wall)
@@ -134,7 +129,7 @@ class Snake:
                     wall = next_wall
                 else:
                     continue
-            if x == 10 and (y >= 10 and y <=15):
+            if x == 10 and y >= 10 and y <=15:
                 continue
 
 
