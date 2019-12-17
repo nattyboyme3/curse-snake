@@ -29,7 +29,7 @@ def clear_pause(screen):
 
 
 class SnakeGame():
-    def __init__(self, is_simple=False, start_speed=0.3, walls=10, points=0, level=1):
+    def __init__(self, is_simple=False, start_speed=0.3, walls=10, points=0, level=1, level_up=400):
         self.snake = Snake(h=walls)
         self.walls = walls
         self.simple = is_simple
@@ -62,7 +62,7 @@ class SnakeGame():
         self.start_speed = start_speed
         self.lost = False
         self.display_scores = True
-        self.level_up = 400
+        self.level_up = level_up
 
     def get_scores(self):
         scores = []
@@ -97,15 +97,16 @@ class SnakeGame():
         countdown_window.bkgd(' ', curses.color_pair(4) | curses.A_BOLD)
         countdown_window.border()
         countdown_window.addstr(1, 7, 'GET READY! ', curses.color_pair(4) | curses.A_BOLD)
-        countdown_window.addstr(4,4, 'Move:  Arrow Keys', curses.color_pair(4))
-        countdown_window.addstr(5,4, '       or WASD', curses.color_pair(4))
-        countdown_window.addstr(6,4, 'Pause: Space', curses.color_pair(4))
+        countdown_window.addstr(4, 4, 'Move:   Arrow Keys', curses.color_pair(4))
+        countdown_window.addstr(5, 4, '        or WASD', curses.color_pair(4))
+        countdown_window.addstr(6, 4, 'Pause:  Space', curses.color_pair(4))
+        countdown_window.addstr(7, 4, 'Exit:   Ctrl + C', curses.color_pair(4))
 
         countdown_window.refresh()
         countdown = 3
         while countdown > 0:
             countdown_string = ' ...' + str(countdown) + '... '
-            countdown_window.addstr(2, 6, str(countdown_string), curses.color_pair(4) | curses.A_BOLD)
+            countdown_window.addstr(2, 8, str(countdown_string), curses.color_pair(4) | curses.A_BOLD)
             countdown_window.move(0, 0)
             countdown_window.refresh()
             countdown = countdown - 1
@@ -196,9 +197,9 @@ class SnakeGame():
             clear_pause(score_window)
 
         if self.lost:
-            return self.lost, self.points, self.walls, self.speed, self.level
+            return self.lost, self.points, self.walls, self.speed, self.level, self.level_up
         else:
-            return self.lost, self.points + self.snake.l, self.walls + 5, self.start_speed * .95, self.level +1
+            return self.lost, self.points + self.snake.l, self.walls + 5, self.start_speed * .95, self.level +1, self.level_up
 
     def print_snake(self):
         maxes = self.screen.getmaxyx()
@@ -216,10 +217,10 @@ class SnakeGame():
                 w_string = "Walls: "
                 s_string = "Speed: "
                 l_string = "Level: "
-            self.screen.addstr(0, 2, p_string + str(int(self.points)))
-            self.screen.addstr(0, 2 + interval, w_string + str(self.walls))
-            self.screen.addstr(0, 2 + (interval * 2), s_string + str(round(self.speed, 2)))
-            self.screen.addstr(0, 2 + (interval * 3), l_string + str(self.level))
+            self.screen.addstr(0, 2, l_string + str(self.level))
+            self.screen.addstr(0, 2 + interval, p_string + str(int(self.points)) + ' of ' + str(self.start_points + int(self.level_up)))
+            self.screen.addstr(0, 2 + (interval * 2), w_string + str(self.walls))
+            self.screen.addstr(0, 2 + (interval * 3), s_string + str(round(self.speed, 2)))
 
         if len(self.snake.a) < self.min_apples:
             self.snake.apple(maxes)
@@ -265,7 +266,8 @@ class SnakeGame():
                 menu_finished = None
                 while not menu_finished:
                     menu_finished = self.menu(menu_finished)
-                self.speed, self.walls, self.level_up  = menu_finished
+                self.speed, self.walls, self.level_up = menu_finished
+                self.snake.h = self.walls
                 self.start_speed = self.speed
             self.snake.wall(self.screen.getmaxyx())
             self.print_snake()
@@ -343,8 +345,8 @@ class SnakeGame():
     def menu(self, second):
         maxes = self.screen.getmaxyx()
         quit_message = 'Press CTRL+C to exit'
-        difficulties = ['Easy', 'Moderate', 'Hard', 'Impossible']
-        time_walls = [(0.6, 5, 400),(0.4,10, 600),(0.2,15, 800),(0.1,20, 1000)]
+        difficulties = ['Lily', 'Easy', 'Moderate', 'Hard', 'Impossible']
+        time_walls = [(.5,1,300),(0.6, 5, 400),(0.4,10, 600),(0.2,15, 800),(0.1,20, 1000)]
         menu_window = curses.newwin(8+len(difficulties), 34, int(maxes[0]/2)-7, int(maxes[1] / 2) - 17)
         menu_window.bkgdset(' ', curses.color_pair(4) | curses.A_BOLD)
         menu_window.bkgd(' ', curses.color_pair(4) | curses.A_BOLD)
@@ -386,6 +388,7 @@ if __name__ == '__main__':
     initial_difficulty = 10
     initial_start_points = 0
     initial_start_level = 1
+    initial_level_up = 400
     if len(argv) > 1:
         arg_index = 1
         if argv[arg_index] == '-h':
@@ -403,18 +406,21 @@ if __name__ == '__main__':
     difficulty = initial_difficulty
     start_level = initial_start_level
     start_points = initial_start_points
+    level_up = initial_level_up
     while True:
         game = SnakeGame(start_speed=speed,
                          walls=difficulty,
                          points=start_points,
-                         level=start_level)
+                         level=start_level,
+                         level_up=level_up)
         try:
-            lost, new_start_points, new_walls, new_speed, new_start_level = game.play()
+            lost, new_start_points, new_walls, new_speed, new_start_level, new_level_up = game.play()
             if not lost:
                 start_points = new_start_points
                 difficulty = new_walls
                 speed = new_speed
                 start_level = new_start_level
+                level_up = new_level_up
             else:
                 speed = initial_speed
                 difficulty = initial_difficulty
