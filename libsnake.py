@@ -1,4 +1,3 @@
-import copy
 import time
 import random
 
@@ -112,12 +111,12 @@ class Snake:
             x = random.randint(1,int(maxes[1]/2)-2)
             length = random.randint(3,7)
             direction = random.randint(0,3)
-            if x == 10 and y>= 10 and y<=15:
+            if all(x == 10, y>= 10, y<=15):
                 continue
             wall = Position(y,x)
             self.b.append(wall)
             for j in range(length):
-                next_wall = copy.deepcopy(wall)
+                next_wall = Position(wall.y, wall.x)
                 next_wall.move(direction)
                 if not (next_wall.y > (maxes[0]-2) or
                         (next_wall.x*2) > (maxes[1]-2) or
@@ -129,7 +128,7 @@ class Snake:
                     wall = next_wall
                 else:
                     continue
-            if x == 10 and y >= 10 and y <=15:
+            if all(x == 10, y >= 10, y <=15):
                 continue
 
 

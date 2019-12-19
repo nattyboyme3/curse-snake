@@ -1,6 +1,5 @@
-from curse_snake import *
+from libsnake import *
 import curses
-import time
 from sys import argv
 import csv
 import os
@@ -346,7 +345,7 @@ class SnakeGame():
         maxes = self.screen.getmaxyx()
         quit_message = 'Press CTRL+C to exit'
         difficulties = ['Lily', 'Easy', 'Moderate', 'Hard', 'Impossible']
-        time_walls = [(.5,1,300),(0.6, 5, 400),(0.4,10, 600),(0.2,15, 800),(0.1,20, 1000)]
+        time_walls = [(.5,1,300),(0.4, 5, 400),(0.2,10, 600),(0.15,15, 800),(0.1,20, 1000)]
         menu_window = curses.newwin(8+len(difficulties), 34, int(maxes[0]/2)-7, int(maxes[1] / 2) - 17)
         menu_window.bkgdset(' ', curses.color_pair(4) | curses.A_BOLD)
         menu_window.bkgd(' ', curses.color_pair(4) | curses.A_BOLD)
@@ -389,19 +388,6 @@ if __name__ == '__main__':
     initial_start_points = 0
     initial_start_level = 1
     initial_level_up = 400
-    if len(argv) > 1:
-        arg_index = 1
-        if argv[arg_index] == '-h':
-            print(f'Usage: {argv[0]} [<speed>] (in milliseconds per move) [<walls>]')
-            exit()
-        try:
-            if not arg_index > len(argv):
-                initial_speed = float(argv[arg_index])
-                arg_index = arg_index + 1
-            if not arg_index > len(argv):
-                initial_difficulty = int(argv[arg_index])
-        except ValueError:
-            pass
     speed = initial_speed
     difficulty = initial_difficulty
     start_level = initial_start_level

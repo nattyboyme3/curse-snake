@@ -1,18 +1,41 @@
 # Curse Snake 
-## (Python Snake game using curses library)
+ Python Snake game using Python curses library
 
- - Requires Python 3.6+
+**Requires [Python 3.6+](https://www.python.org/downloads/) and works on MacOS**
 
-To run: 
+(looking for Windows NCurses developers to contribute to Windows compatibility)
 
-```python3 snake.py```
+To play: 
 
-Available arguments: 
+- Run ```python3 snake.py``` from a ```curses```-compatible terminal (Terminal.app, for instance)
+ 
+To clear high scores:
+ 
+- Delete ```.snake_scores.csv``` in the working directory
 
-```python3 snake.py [infinite] [<move interval>] [<number of walls>]```
+To Cheat: 
+- Edit in a ridiculously high score into ```.snake_scores.csv``` in the format ```[initials],[score],[level]```
+ 
+## Gameplay
 
-Turning the infinite option on provides an extra challenge: the game doesn't erase snake body characters after the snake has left the space. You can still reuse these spaces, but you might run into your tail once it gets long.
+This is a classic snake game in the style of the games I remember from the days of Nokia brick phones. The goal of the game is to eat apples while avoiding walls, obstacles and the snake's own body. 
 
-The move interval is in units of seconds. A recommended starting interval is .3 seconds, or .15 seconds if you don't have walls. The default is .3 seconds.  
+Each apple increases the length of the snake, and over time the snake begins to move faster.
 
-The number of walls created increases the difficulty. 5 to 20 walls is a good starting place. The default is 10.
+Points are awarded for each snake movement, with a larger number of additional points awarded for eating apples.
+
+## Difficulty
+
+- **Lily**: Named for my youngest daughter, appropriate for a 4-year-old skill level. *(1 Wall to start, 0.5 second movement intervals, levels up after 300 points)*
+- **Easy**: A nice easy snake game. *(5 walls to start, 0.4 seconds per move, levels up after 400 points)*
+- **Moderate:** Medium difficulty for medium people with moderate personalities. *(10 walls, 0.2 seconds per move, levels up after 600 points)*
+- **Hard:** A substantial challenge for the average player. *(15 walls, 0.15 seconds per move, levels up after 800 points)*
+- **Impossible:** Still challenging to the author. *(20 walls, 0.1 seconds per move, levels up after 1000 points)*
+
+
+## Controls
+| Function | Key(s)|
+| --- | --- |
+| **Movement** | <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd>, or <kbd>&#8592;</kbd> <kbd>&#8593;</kbd> <kbd>&#8594;</kbd> <kbd>&#8595;</kbd>|
+| **Pause** | <kbd>Space</kbd> |
+| **Hide Points Display** | <kbd>V</kbd> |
