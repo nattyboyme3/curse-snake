@@ -65,10 +65,18 @@ class SnakeGame():
 
     def get_scores(self):
         scores = []
-        with open(self.score_file,"r", newline='') as csv_file:
-            score_reader = csv.DictReader(csv_file)
-            for row in score_reader:
-                scores.append(row)
+        if os.path.exists(self.score_file):
+            with open(self.score_file,"r", newline='') as csv_file:
+                score_reader = csv.DictReader(csv_file)
+                for row in score_reader:
+                    scores.append(row)
+        else:
+
+            for j in range(10):
+                score = {}
+                for i in self.score_fields:
+                    score[i]='0'
+                scores.append(score)
         return scores
 
     def add_score(self, initials, score, level):
@@ -87,9 +95,6 @@ class SnakeGame():
                              })
 
     def countdown(self):
-
-        # TODO : put controls in instructions
-        # TODO : put exit and pause in instructions
         maxes = self.screen.getmaxyx()
         countdown_window = curses.newwin(10, 25, int(maxes[0]/2)-5, int(maxes[1]/2)-10)
         countdown_window.bkgdset(' ', curses.color_pair(4) | curses.A_BOLD)
@@ -160,7 +165,12 @@ class SnakeGame():
             score_window.clear()
             self.high_scores = self.get_scores()
             sorted_scores = sorted(self.high_scores, key=lambda item: int(item['score']), reverse=True)
-            if int(self.points) > int(sorted_scores[9][self.score_fields[1]]):
+            score_list_length = len(sorted_scores)
+            if score_list_length > 10:
+                score_list_length = 9
+            else:
+                score_list_length = score_list_length-1
+            if int(self.points) > int(sorted_scores[score_list_length][self.score_fields[1]]):
                 # get real input
                 curses.echo()
                 curses.nocbreak()

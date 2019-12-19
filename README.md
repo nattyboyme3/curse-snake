@@ -39,3 +39,4 @@ Points are awarded for each snake movement, with a larger number of additional p
 | **Movement** | <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd>, or <kbd>&#8592;</kbd> <kbd>&#8593;</kbd> <kbd>&#8594;</kbd> <kbd>&#8595;</kbd>|
 | **Pause** | <kbd>Space</kbd> |
 | **Hide Points Display** | <kbd>V</kbd> |
+| **Exit** | <kbd>Ctrl</kbd>+<kbd>C</kbd> |
