@@ -111,7 +111,7 @@ class Snake:
             x = random.randint(1,int(maxes[1]/2)-2)
             length = random.randint(3,7)
             direction = random.randint(0,3)
-            if all(x == 10, y>= 10, y<=15):
+            if all([x == 10, y>= 10, y<=15]):
                 continue
             wall = Position(y,x)
             self.b.append(wall)
@@ -128,7 +128,7 @@ class Snake:
                     wall = next_wall
                 else:
                     continue
-            if all(x == 10, y >= 10, y <=15):
+            if all([x == 10, y >= 10, y <=15]):
                 continue
 
 
