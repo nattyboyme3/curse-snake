@@ -133,6 +133,7 @@ class SnakeGame():
 
     def game_over(self):
         maxes = self.screen.getmaxyx()
+        self.print_snake(False)
         score_window = curses.newwin(19, 40, 4, int(maxes[1] / 2) - 20)
         score_window.bkgdset(' ', curses.color_pair(4))
         score_window.bkgd(' ', curses.color_pair(4))
@@ -210,7 +211,7 @@ class SnakeGame():
         else:
             return self.lost, self.points + self.snake.l, self.walls + 5, self.start_speed * .95, self.level +1, self.level_up
 
-    def print_snake(self):
+    def print_snake(self, check_dead=True):
         maxes = self.screen.getmaxyx()
         self.screen.clear()
         self.screen.border()
@@ -226,8 +227,8 @@ class SnakeGame():
                 w_string = "Walls: "
                 s_string = "Speed: "
                 l_string = "Level: "
-            self.screen.addstr(0, 2, l_string + str(self.level))
-            self.screen.addstr(0, 2 + interval, p_string + str(int(self.points)) + ' of ' + str(self.start_points + int(self.level_up)))
+            self.screen.addstr(0, 2, l_string + str(int(self.level)))
+            self.screen.addstr(0, 2 + interval, p_string + str(int(self.points)) + ' of ' + str(int(self.start_points + self.level_up)))
             self.screen.addstr(0, 2 + (interval * 2), w_string + str(self.walls))
             self.screen.addstr(0, 2 + (interval * 3), s_string + str(round(self.speed, 2)))
 
@@ -236,7 +237,7 @@ class SnakeGame():
         if self.snake.eat(self.growth):
             curses.beep()
             self.points = self.points + self.walls
-        if self.snake.dead(maxes):
+        if self.snake.dead(maxes) and check_dead:
             raise SnakeDead
         for i in range(self.snake.l):
             if i == 0:
