@@ -354,6 +354,7 @@ class SnakeGame():
 
     def menu(self, second):
         maxes = self.screen.getmaxyx()
+        self.screen.clear()
         quit_message = 'Press CTRL+C to exit'
         difficulties = ['Lily', 'Easy', 'Moderate', 'Hard', 'Impossible']
         time_walls = [(.5,1,300),(0.4, 5, 400),(0.2,10, 600),(0.15,15, 800),(0.1,20, 1000)]
